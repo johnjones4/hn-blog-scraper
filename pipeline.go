@@ -10,7 +10,6 @@ import (
 
 type pipeline struct {
 	in    chan any
-	out   chan any
 	store *store
 	log   *slog.Logger
 }
@@ -36,6 +35,6 @@ func (p *pipeline) start(ctx context.Context) error {
 		Via(flow.NewFilter[*scrapedSite](func(ss *scrapedSite) bool {
 			return ss != nil
 		}, 10)).
-		To(extension.NewChanSink(p.out))
+		To(extension.NewChanSink(p.store.in))
 	return nil
 }

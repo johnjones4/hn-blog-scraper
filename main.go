@@ -26,7 +26,6 @@ func main() {
 
 	pipe := &pipeline{
 		in:    nhScraper.output,
-		out:   s.in,
 		log:   log,
 		store: s,
 	}
