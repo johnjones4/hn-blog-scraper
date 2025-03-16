@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS scraped_site (
   feed_url TEXT,
   site_title TEXT,
   site_description TEXT,
+  keywords TEXT,
   created TEXT
 );

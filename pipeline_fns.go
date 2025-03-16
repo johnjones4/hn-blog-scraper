@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	rake "github.com/afjoseph/RAKE.go"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 func scrapeSite(post *hnpost) (*scrapedSite, error) {
@@ -51,13 +55,21 @@ func scrapeSite(post *hnpost) (*scrapedSite, error) {
 	titleEl := doc.Find("title").First()
 	var title string
 	if titleEl != nil {
-		title = titleEl.Text()
+		title = strings.TrimSpace(titleEl.Text())
 	}
 
 	descEl := doc.Find("meta[name=\"description\"]").First()
 	var description string
 	if descEl != nil {
-		description = descEl.AttrOr("content", "")
+		description = strings.TrimSpace(descEl.AttrOr("content", ""))
+	}
+
+	body := doc.Find("body").First().Text()
+	cleanBody := bluemonday.StrictPolicy().Sanitize(body)
+	candidates := rake.RunRake(cleanBody)
+	keywords := make([]string, 0, len(candidates))
+	for _, c := range candidates {
+		keywords = append(keywords, c.Key)
 	}
 
 	return &scrapedSite{
@@ -65,5 +77,7 @@ func scrapeSite(post *hnpost) (*scrapedSite, error) {
 		feedUrl:         resolvedParsedUrl.String(),
 		siteTitle:       title,
 		siteDescription: description,
+		created:         time.Now(),
+		keywords:        keywords,
 	}, nil
 }

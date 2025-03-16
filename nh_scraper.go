@@ -8,24 +8,31 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
+var feeds = []string{
+	"https://twostopbits.com/rss",
+	"https://news.ycombinator.com/rss",
+}
+
 type nhscraper struct {
 	output chan any
 	log    *slog.Logger
 }
 
 func (h *nhscraper) parseFeed(ctx context.Context) error {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL("https://news.ycombinator.com/rss")
-	if err != nil {
-		return err
-	}
-	for _, item := range feed.Items {
-		post := hnpost{
-			url:   item.Link,
-			title: item.Title,
+	for _, url := range feeds {
+		fp := gofeed.NewParser()
+		feed, err := fp.ParseURL(url)
+		if err != nil {
+			h.log.Error("error parsing feed", slog.Any("error", err), slog.String("url", url))
 		}
-		h.log.Debug("found item", slog.Any("item", *item))
-		h.output <- &post
+		for _, item := range feed.Items {
+			post := hnpost{
+				url:   item.Link,
+				title: item.Title,
+			}
+			h.log.Info("found item", slog.Any("item", *item))
+			h.output <- &post
+		}
 	}
 	return nil
 }

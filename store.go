@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"log/slog"
-	"time"
 
 	_ "embed"
 
@@ -56,13 +56,22 @@ func (s *store) hasPostBeenScraped(ctx context.Context, postUrl string) (bool, e
 }
 
 func (s *store) insertScrape(ctx context.Context, site *scrapedSite) error {
-	_, err := s.db.ExecContext(ctx, "insert into scraped_site (post_url, post_title, feed_url, site_title, site_description, created) values (?,?,?,?,?,?)",
+	keywords, err := json.Marshal(site.keywords)
+	if err != nil {
+		return err
+	}
+	_, err = s.db.ExecContext(ctx, "insert into scraped_site (post_url, post_title, feed_url, site_title, site_description, keywords, created) values (?,?,?,?,?,?,?)",
 		site.post.url,
 		site.post.title,
 		site.feedUrl,
 		site.siteTitle,
 		site.siteDescription,
-		time.Now(),
+		string(keywords),
+		site.created,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	s.log.Info("inserted site", slog.String("title", site.siteTitle))
+	return nil
 }
