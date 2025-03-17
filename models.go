@@ -3,15 +3,22 @@ package main
 import "time"
 
 type hnpost struct {
-	url   string
-	title string
+	Url   string
+	Title string
 }
 
 type scrapedSite struct {
-	post            hnpost
-	feedUrl         string
-	siteTitle       string
-	siteDescription string
-	keywords        []string
-	created         time.Time
+	Post            hnpost
+	FeedUrl         string
+	SiteTitle       string
+	SiteDescription string
+	Keywords        []string
+	Created         time.Time
+}
+
+type scrapedStat struct {
+	SiteTitle       string
+	SiteDescription string
+	FeedUrl         string
+	PostCount       int
 }

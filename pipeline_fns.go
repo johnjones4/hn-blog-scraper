@@ -13,7 +13,7 @@ import (
 )
 
 func scrapeSite(post *hnpost) (*scrapedSite, error) {
-	res, err := http.Get(post.url)
+	res, err := http.Get(post.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func scrapeSite(post *hnpost) (*scrapedSite, error) {
 		return nil, nil
 	}
 
-	parsedUrl, err := url.Parse(post.url)
+	parsedUrl, err := url.Parse(post.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +52,18 @@ func scrapeSite(post *hnpost) (*scrapedSite, error) {
 
 	resolvedParsedUrl := parsedUrl.ResolveReference(parsedFeedUrl)
 
-	titleEl := doc.Find("title").First()
-	var title string
-	if titleEl != nil {
-		title = strings.TrimSpace(titleEl.Text())
+	var siteName string
+
+	siteNameOg := doc.Find("meta[property=\"og:site_name\"]").First()
+	if siteNameOg != nil {
+		siteName = strings.TrimSpace(siteNameOg.AttrOr("content", ""))
+	}
+
+	if siteName == "" {
+		titleEl := doc.Find("title").First()
+		if titleEl != nil {
+			siteName = strings.TrimSpace(titleEl.Text())
+		}
 	}
 
 	descEl := doc.Find("meta[name=\"description\"]").First()
@@ -73,11 +81,11 @@ func scrapeSite(post *hnpost) (*scrapedSite, error) {
 	}
 
 	return &scrapedSite{
-		post:            *post,
-		feedUrl:         resolvedParsedUrl.String(),
-		siteTitle:       title,
-		siteDescription: description,
-		created:         time.Now(),
-		keywords:        keywords,
+		Post:            *post,
+		FeedUrl:         resolvedParsedUrl.String(),
+		SiteTitle:       siteName,
+		SiteDescription: description,
+		Created:         time.Now(),
+		Keywords:        keywords,
 	}, nil
 }

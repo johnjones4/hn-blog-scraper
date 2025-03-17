@@ -27,8 +27,8 @@ func (h *nhscraper) parseFeed(ctx context.Context) error {
 		}
 		for _, item := range feed.Items {
 			post := hnpost{
-				url:   item.Link,
-				title: item.Title,
+				Url:   item.Link,
+				Title: item.Title,
 			}
 			h.log.Info("found item", slog.Any("item", *item))
 			h.output <- &post

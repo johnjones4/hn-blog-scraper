@@ -30,10 +30,16 @@ func main() {
 		store: s,
 	}
 
+	server := &httpServer{
+		log:   log,
+		store: s,
+	}
+
 	processes := []process{
 		nhScraper,
 		s,
 		pipe,
+		server,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

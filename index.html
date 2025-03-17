@@ -1,0 +1,37 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scraper Results</title>
+</head>
+
+<body>
+  <h1>Scraper Results</h1>
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Post Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Sites }}
+        <tr>
+          <td>
+            <a href="{{ .FeedUrl }}">{{ .SiteTitle }}</a>
+          </td>
+          <td>
+            {{ .SiteDescription }}
+          </td>
+          <td>
+            {{ .PostCount }}
+          </td>
+        </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</body>
+</html>

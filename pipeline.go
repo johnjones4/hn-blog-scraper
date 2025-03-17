@@ -17,7 +17,7 @@ type pipeline struct {
 func (p *pipeline) start(ctx context.Context) error {
 	extension.NewChanSource(p.in).
 		Via(flow.NewFilter[*hnpost](func(h *hnpost) bool {
-			exists, err := p.store.hasPostBeenScraped(ctx, h.url)
+			exists, err := p.store.hasPostBeenScraped(ctx, h.Url)
 			if err != nil {
 				p.log.Error("error checking post status", slog.Any("error", err))
 				return false
